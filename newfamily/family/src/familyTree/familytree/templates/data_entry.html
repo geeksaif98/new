@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load static %}
+<html ng-app="evsApp">
+<head>
+    <title>Python HTML</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'node_modules/animate.css/animate.min.css' %}">
+    <link rel="stylesheet" href="{% static 'node_modules/@fortawesome/fontawesome-free/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'node_modules/@chenfengyuan/datepicker/dist/datepicker.min.css' %}">
+    <link rel="stylesheet" href="{% static 'node_modules/chosen-js/chosen.min.css' %}">
+    <link rel="stylesheet" href="{% static 'node_modules/bootstrap-chosen/bootstrap-chosen.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+</head>
+<body>
+<div id="Wrapper">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Python</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Dropdown
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </li>
+                </ul>
+                <div class="my-2 my-lg-0">
+                    <button class="btn btn-sm btn-info"><i class="fas fa-user-plus"></i> Register</button>
+                    <button class="btn btn-sm btn-success ml-2"><i class="fas fa-sign-in-alt"></i> Login</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" ng-controller="userCtrl" ng-init="init()">
+        <div class="card mt-4">
+            <div class="card-header"><h4>Page title</h4></div>
+            <div class="card-body">
+                <form action="{% url 'entry_form' %}" method="POST" ng-submit="user.formSubmit($event)">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="national_id">National ID</label>
+                                <input type="text" class="form-control" id="national_id" ng-model="user.national_id" name="national_id"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="f_name">First name</label>
+                                <input type="text" class="form-control" id="f_name" ng-model="user.fname" name="f_name"
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="birthdate">Date of birth</label>
+                                <input type="text" class="form-control" id="birthdate" ng-model="user.birthdate"
+                                       data-toggle="datepicker" name="birthdate" placeholder="DD-MM-YYYY" required>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="gender">Gender</label>
+                                <div class="d-block">
+                                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                        <label class="btn btn-secondary  active">
+                                            <input type="radio" name="gender" ng-model="user.gender" autocomplete="off"
+                                                   value="male" checked> <i class="fas fa-male"></i> Male
+                                        </label>
+                                        <label class="btn btn-secondary ">
+                                            <input type="radio" name="gender" ng-model="user.gender" autocomplete="off"
+                                                   value="female"><i class="fas fa-female"></i> Female
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" ng-model="user.is_dead" name="is_dead"
+                                           class="custom-control-input" id="is_dead">
+                                    <label class="custom-control-label" for="is_dead">Is dead</label>
+                                    <input type="text" ng-if="user.is_dead" ng-model="user.dead_date"
+                                           data-toggle="datepicker" name="dead_date"
+                                           class="form-control form-control-sm" id="dead_date" placeholder="DD-MM-YYYY">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <fieldset class="fieldset">
+                        <legend>Parents</legend>
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <select class="chosen-select form-control" id="fathers-select" data-placeholder="Choose a father" ng-model="user.father"
+                                        name="father" data-ajax-url="{% url 'fatherslist'  %}" ng-change="get_mothers()">
+                                    <option value="[[ father.id ]]" ng-repeat=" father in fathers_list">[[ father.name ]] (id: [[ father.id ]]) </option>
+                                </select>
+                                <label class="d-block">
+                                    Father
+<!--                                    <a href="#" class="float-right font-14" ng-click="user.parents_modal($event)"-->
+<!--                                       data-parent-type="father" data-target="#ParentsModal"><b><i-->
+<!--                                            class="fas fa-plus"></i> Add new</b></a>-->
+                                </label>
+                            </div>
+                            <div class="col">
+                                <div class="custom-control custom-checkbox check-box-margin">
+                                    <input type="checkbox" ng-model="user.fathe_is_family" name="father_is_family"
+                                           class="custom-control-input" id="father_is_family">
+                                    <label class="custom-control-label" for="father_is_family">From family</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-3">
+                                <label class="d-block">
+                                    Mother
+<!--                                    <a href="#" class="float-right font-14" ng-click="user.parents_modal($event)"-->
+<!--                                       data-parent-type="mother" data-target="#ParentsModal"><b><i-->
+<!--                                            class="fas fa-plus"></i> Add new</b></a>-->
+                                </label>
+                                <select class="chosen-select form-control" id="mothers-select" data-placeholder="Choose a mother" ng-model="user.mother"
+                                        name="mother" data-ajax-url="{% url 'motherslist'  %}">
+                                    <option value="[[ mother.id ]]" ng-repeat=" mother in mothers_list">[[ mother.name ]] (id: [[ mother.id ]])</option>
+                                </select>
+                            </div>
+<!--                            <div class="col">-->
+<!--                                <div class="custom-control custom-checkbox check-box-margin">-->
+<!--                                    <input type="checkbox" ng-model="user.mother.is_family" name="mother_is_family"-->
+<!--                                           class="custom-control-input" id="mother_is_family">-->
+<!--                                    <label class="custom-control-label" for="mother_is_family">From family</label>-->
+<!--                                </div>-->
+<!--                            </div>-->
+                        </div>
+                    </fieldset>
+
+
+<!--                    <fieldset class="fieldset mt-4">-->
+<!--                        <legend>Marriage</legend>-->
+<!--                        <table class="table table-bordered bg-white">-->
+<!--                            <thead>-->
+<!--                            <tr>-->
+<!--                                <th style="width:50px;">#</th>-->
+<!--                                <th>Name</th>-->
+<!--                                <th>Birthdate</th>-->
+<!--                                <th>Status</th>-->
+<!--                                <th>Actions</th>-->
+<!--                            </tr>-->
+<!--                            </thead>-->
+<!--                            <tbody>-->
+<!--                            <tr ng-repeat="marriage in user.marriage_list" id="marriage-row-[[ $index + 1 ]]">-->
+<!--                                <td>[[$index + 1]]</td>-->
+<!--                                <td>[[marriage.f_name]] [[marriage.s_name]]</td>-->
+<!--                                <td>[[marriage.birthdate]]</td>-->
+<!--                                <td>[[marriage.status]]</td>-->
+<!--                                <td>-->
+<!--                                    <button type="button" ng-click="user.marriage_modal_remove($event)"-->
+<!--                                            data-row-id="[[$index]]" class="btn btn-sm btn-danger"><i-->
+<!--                                            class="fas fa-times"></i> Remove-->
+<!--                                    </button>-->
+<!--                                </td>-->
+<!--                            </tr>-->
+<!--                            </tbody>-->
+<!--                        </table>-->
+<!--                        <div class="text-right">-->
+<!--                            <button type="button" class="btn btn-sm btn-info" ng-click="user.marriage_modal($event)"-->
+<!--                                    data-marriage-type="family" data-target="#Marriage-Modal">-->
+<!--                                <i class="fas fa-plus"></i> Add from family-->
+<!--                            </button>-->
+<!--                            <button type="button" class="btn btn-sm btn-secondary"-->
+<!--                                    ng-click="user.marriage_modal($event)" data-marriage-type="outside"-->
+<!--                                    data-target="#Marriage-Modal">-->
+<!--                                <i class="fas fa-plus"></i> Add from outside-->
+<!--                            </button>-->
+<!--                        </div>-->
+<!--                    </fieldset>-->
+                    <div class="text-right mt-3">
+                        <button type="submit" class="btn btn-lg btn-primary">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!--                <form action="">-->
+<!--        <div class="modal fade" id="Marriage-Modal" tabindex="-1" role="dialog" aria-hidden="true">-->
+<!--            <div class="modal-dialog" role="document">-->
+<!--                <div class="modal-content">-->
+<!--                    <div class="modal-header">-->
+<!--                        <h5 class="modal-title">Add marriage-->
+<!--                            <small> [ {{user.marriage_modal.type}} ]</small>-->
+<!--                        </h5>-->
+<!--                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+<!--                            <span aria-hidden="true">&times;</span>-->
+<!--                        </button>-->
+<!--                    </div>-->
+
+<!--                    <div class="modal-body">-->
+<!--                        <div class="row">-->
+<!--                            <div class="col-6">-->
+<!--                                <div class="form-group">-->
+<!--                                    <label for="marriage_modal-f_name">First name</label>-->
+<!--                                    <input type="text" class="form-control"-->
+<!--                                           id="marriage_modal-marriage_modalf_name"-->
+<!--                                           ng-model="user.marriage_modal_data.fname">-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-6">-->
+<!--                                <div class="form-group">-->
+<!--                                    <label for="marriage_modal-s_name">Second name</label>-->
+<!--                                    <input type="text" class="form-control" id="marriage_modal-s_name"-->
+<!--                                           ng-model="user.marriage_modal_data.sname">-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-6">-->
+<!--                                <div class="form-group">-->
+<!--                                    <label for="marriage_modal-birthdate">Date of birth</label>-->
+<!--                                    <input type="text" class="form-control" id="marriage_modal-birthdate"-->
+<!--                                           ng-model="user.marriage_modal_data.birthdate"-->
+<!--                                           data-toggle="datepicker" placeholder="DD-MM-YYYY">-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-6">-->
+<!--                                <div class="form-group">-->
+<!--                                    <label for="marriage_modal-gender">Gender</label>-->
+<!--                                    <div class="d-block">-->
+<!--                                        <div class="btn-group btn-group-toggle" data-toggle="buttons">-->
+<!--                                            <label class="btn btn-secondary">-->
+<!--                                                <input type="radio"-->
+<!--                                                       ng-model="user.marriage_modal_data.gender"-->
+<!--                                                       autocomplete="off" value="male"> <i-->
+<!--                                                    class="fas fa-male"></i> Male-->
+<!--                                            </label>-->
+<!--                                            <label class="btn btn-secondary ">-->
+<!--                                                <input type="radio"-->
+<!--                                                       ng-model="user.marriage_modal_data.gender"-->
+<!--                                                       autocomplete="off" value="female"><i-->
+<!--                                                    class="fas fa-female"></i> Female-->
+<!--                                            </label>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-6">-->
+<!--                                <div class="form-group">-->
+<!--                                    <label for="marriage_modal-status">Status</label>-->
+<!--                                    <input type="text" class="form-control" id="marriage_modal-status"-->
+<!--                                           ng-model="user.marriage_modal_data.status">-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                            <div class="col-6">-->
+<!--                                <div class="form-group">-->
+<!--                                    <label for="marriage_modal-date_status">Date of status</label>-->
+<!--                                    <input type="text" class="form-control" id="marriage_modal-date_status"-->
+<!--                                           ng-model="user.marriage_modal_data.date_status"-->
+<!--                                           data-toggle="datepicker" placeholder="DD-MM-YYYY">-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="row">-->
+<!--                            <div class="col-6">-->
+<!--                                <div class="form-group">-->
+<!--                                    <div class="custom-control custom-checkbox">-->
+<!--                                        <input type="checkbox" ng-model="user.marriage_modal_data.is_dead"-->
+<!--                                               class="custom-control-input" id="marriage_modal-is_dead">-->
+<!--                                        <label class="custom-control-label" for="marriage_modal-is_dead">Is-->
+<!--                                            dead</label>-->
+<!--                                        <input type="text" ng-if="user.marriage_modal_data.is_dead"-->
+<!--                                               ng-model="user.marriage_modal_data.dead_date"-->
+<!--                                               data-toggle="datepicker" class="form-control form-control-sm"-->
+<!--                                               id="marriage_modal-dead_date" placeholder="DD-MM-YYYY">-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="modal-footer">-->
+<!--                        <button type="button" class="btn btn-primary" data-dismiss="modal"-->
+<!--                                data-target="#Marriage-Modal" ng-click="user.marriage_modal_save($event)">-->
+<!--                            Add new-->
+<!--                        </button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <!--                </form>    -->
+        <div class="modal fade" id="ParentsModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add {{user.parents_modal.type}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="parents_modal-f_name">First name</label>
+                                    <input type="text" class="form-control" id="parents_modal-marriage_modalf_name"
+                                           ng-model="user.parents_modal_data.fname">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="parents_modal-s_name">Second name</label>
+                                    <input type="text" class="form-control" id="parents_modal-s_name"
+                                           ng-model="user.parents_modal_data.sname">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="parents_modal-birthdate">Date of birth</label>
+                                    <input type="text" class="form-control" id="parents_modal-birthdate"
+                                           ng-model="user.parents_modal_data.birthdate" data-toggle="datepicker"
+                                           placeholder="DD-MM-YYYY">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="parents_modal-gender">Gender</label>
+                                    <div class="d-block">
+                                        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                            <label class="btn btn-secondary">
+                                                <input type="radio" ng-model="user.parents_modal_data.gender"
+                                                       autocomplete="off" value="male"> <i class="fas fa-male"></i> Male
+                                            </label>
+                                            <label class="btn btn-secondary ">
+                                                <input type="radio" ng-model="user.parents_modal_data.gender"
+                                                       autocomplete="off" value="female"><i class="fas fa-female"></i>
+                                                Female
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" ng-model="user.parents_modal_data.is_dead"
+                                               class="custom-control-input" id="parents_modal-is_dead">
+                                        <label class="custom-control-label" for="parents_modal-is_dead">Is dead</label>
+                                        <input type="text" ng-if="user.parents_modal_data.is_dead"
+                                               ng-model="user.parents_modal_data.dead_date" data-toggle="datepicker"
+                                               class="form-control form-control-sm" id="parents_modal-dead_date"
+                                               placeholder="DD-MM-YYYY">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="{% static 'javascirpt/lib/jquery_/jquery.js' %}"></script>
+<script src="{% static 'node_modules/jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'node_modules/@chenfengyuan/datepicker/dist/datepicker.min.js' %}"></script>
+<script src="{% static 'node_modules/chosen-js/chosen.jquery.min.js' %}"></script>
+<script src="{% static 'node_modules/angular/angular.min.js' %}"></script>
+<script src="{% static 'assets/js/app.js' %}"></script>
+<script src="{% static 'assets/js/custom.js'%}"></script>
+</body>
+</html>

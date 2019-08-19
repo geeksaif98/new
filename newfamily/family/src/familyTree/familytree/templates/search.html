@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load static %}
+
+<html ng-app="evsApp">
+<head>
+    <title>Python HTML | Search</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'node_modules/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'node_modules/animate.css/animate.min.css' %}">
+    <link rel="stylesheet" href="{% static 'node_modules/@fortawesome/fontawesome-free/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'node_modules/@chenfengyuan/datepicker/dist/datepicker.min.css' %}">
+    <link rel="stylesheet" href="{% static 'node_modules/chosen-js/chosen.min.css' %}">
+    <link rel="stylesheet" href="{% static 'node_modules/bootstrap-chosen/bootstrap-chosen.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/main.css' %}">
+
+</head>
+<body>
+<div id="Wrapper">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">Python</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Dropdown
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">Action</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </li>
+                </ul>
+                <div class="my-2 my-lg-0">
+                    <button class="btn btn-sm btn-info"><i class="fas fa-user-plus"></i> Register</button>
+                    <button class="btn btn-sm btn-success ml-2"><i class="fas fa-sign-in-alt"></i> Login</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <form method="POST" id="searchform">
+        {% csrf_token %}
+        <div class="container" ng-controller="userCtrl">
+            <div class="card mt-4">
+                <div class="card-header"><h4>Search page</h4></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <fieldset class="fieldset">
+                                <legend class="font-16">Name</legend>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <input type="text"
+                                               class="form-control" placeholder="Name" name="Name" id="name">
+                                    </div>
+                                    <div class="col-4">
+                                        <select class="custom-select" name="name_filter_" id="name_filter">
+                                            <option> select filter </option>
+                                            <option value="Contains"> Contains </option>
+                                            <option value="BeginWith"> Begin With</option>
+                                            <option value="EndWith"> End With</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-4">
+                                        <select class="custom-select" name="operration" id="predection">
+                                            <option> predected person </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+
+                        <div class="col-4">
+                            <fieldset class="fieldset">
+                                <legend class="font-16">Age</legend>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="number" class="form-control" placeholder="age" name="age" id="age">
+                                    </div>
+                                    <div class="col-6">
+                                        <select class="custom-select" name="operration" id="operration">
+                                            <option>Select filter</option>
+                                            <option value="="> Equal</option>
+                                            <option value=" < "> Younger than age</option>
+                                            <option value=" > "> Older than age</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="col">
+                            <fieldset class="fieldset">
+                                <legend class="font-16">Gender</legend>
+                                <select class="custom-select" name="gender" id="gender">
+                                    <option value="male">male</option>
+                                    <option value="female">female</option>
+                                </select>
+                            </fieldset>
+                        </div>
+                        <div class="col">
+                            <fieldset class="fieldset">
+                                <legend class="font-16">Status</legend>
+                                <select class="custom-select" name="status" id="status">
+                                    <option value="single">single</option>
+                                    <option value="married">married</option>
+                                    <option value="divorced">divorced</option>
+                                    <option value="widow">widow</option>
+                                </select>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="users-card">
+                        <div class="row" id="cards-list">
+                        </div>
+                    </div>
+                    <input type="submit" value="SUBMIT" class="btn btn-info btn-block">
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript" src="{% static 'javascirpt/lib/jquery_/jquery.js' %}"></script>
+<script src="{% static 'node_modules/jquery/dist/jquery.min.js' %}"></script>
+<script src="{% static 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'node_modules/@chenfengyuan/datepicker/dist/datepicker.min.js' %}"></script>
+<script src="{% static 'node_modules/chosen-js/chosen.jquery.min.js' %}"></script>
+<script src="{% static 'node_modules/angular/angular.min.js' %}"></script>
+<script src="{% static 'assets/js/custom.js' %}"></script>
+<script src="{% static 'assets/js/app.js' %}"></script>
+<script>
+    (function ($) {
+        $(document).on('submit', '#searchform', function (e) {
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+            var card = '';
+
+            var person_id = $("#predection").val();
+            var age = $("#age").val();
+            var operation = $("#operration").val();
+            var gender = $("#gender").val();
+            var status = $("#status").val();
+
+
+            $.ajax({
+                type: "POST",
+                data: {
+                    age:age,
+                    operation:operation,
+                    gender:gender,
+                    status:status,
+                    person_id:person_id,
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                },
+                url: "{% url 'search_form' %}",
+                success: function (r) {
+                    console.log(r);
+                    if (r === "NO Parteners Found"){
+                            alert("NO Parteners Found , TRY ANOTHER FILTER")
+                        }
+                    else if (r === "THIS Person Is DEAD !"){
+                        alert("THIS Person Is DEAD !")
+                    }
+                    else {
+                        $.each(r, function (i, item) {
+                            let id = Number(i);
+                            console.log(id,typeof id);
+                            if (item.gender === 'male') {
+                                card += `
+                                    <div class="col-md-3">
+                                    <div class="users-card">
+                                         <div class="u-card">
+                                              <img src="{% static 'assets/images/male.png' %}" alt="">
+                                              <h4>Name : ${item.name}</h4>
+                                              <h4>Age : ${item.age}</h4>
+                                              <h4>status : ${item.status}</h4>
+                                              <h4>Gender : ${item.gender}</h4>
+                                         </div>
+                                    </div>
+                                 </div>`;
+                            } else if (item.gender === 'female') {
+                                card += `
+                                    <div class="col-md-3">
+                                    <div class="users-card">
+                                         <div class="u-card">
+                                              <img src="{% static 'assets/images/female.png' %}" alt="">
+                                              <h4>Name : ${item.name}</h4>
+                                              <h4>Age : ${item.age}</h4>
+                                              <h4>status : ${item.status}</h4>
+                                              <h4>Gender : ${item.gender}</h4>
+                                         </div>
+                                    </div>
+                                 </div>`;
+                            }
+                        });
+                        $('#cards-list').html(card);
+                    }
+                }
+            });
+
+
+        });
+        $('#name_filter').on('change',function (e) {
+            e.preventDefault(); // avoid to execute the actual submit of the form.
+
+            var name = $("#name").val();
+            var filter = $("#name_filter").val();
+
+            $.ajax({
+                type: "GET",
+                data: {
+                    name:name,
+                    name_filte:filter
+                },
+                url: "{% url 'name_filter' %}",
+                success: function (r) {
+                    console.log(r);
+                    var option_element = "";
+                    $.each(r, function (i, item) {
+                        option_element += `<option value='${item.id}'>${item.name} (id : ${item.id})</option>`;
+                    });
+                    $("#predection").html(option_element)
+
+                }
+            });
+        });
+
+    })(jQuery);
+</script>
+</body>
+</html>
